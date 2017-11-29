@@ -99,6 +99,12 @@ bool ScriptEngine::Initialize() {
 	}
 	g_scriptHandlerMgr = reinterpret_cast<decltype(g_scriptHandlerMgr)>(location + *(int32_t*)location + 4);
 	LOG_DEBUG("g_scriptHandlerMgr\t 0x%p (0x%.8X)", g_scriptHandlerMgr, reinterpret_cast<uintptr_t>(g_scriptHandlerMgr) - executable.begin());
+	
+	// vector3 pointer fix
+	if (auto void_location = pattern("83 79 18 ? 48 8B D1 74 4A FF 4A 18").count(1).get(0).get<void>())
+	{
+		scrNativeCallContext::SetVectorResults = (void(*)(scrNativeCallContext*))(void_location);
+	}
 
 	//script_location
 	auto getScriptIdBlock = pattern("80 78 32 00 75 34 B1 01 E8");
